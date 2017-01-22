@@ -9,18 +9,10 @@ exports.run = ( payload ) => {
   console.log('Executing : metalsmith-blog : Build');
 
   return new Promise(( resolve, reject ) => {
-    // Go to working dir
-    exec(`cd ${workingDir}`, err => {
+    exec(`cd ${workingDir} && git pull && npm run build`, err => {
       if ( err ) return reject(err);
       return resolve()
     })
   })
-    .then(() => new Promise(( resolve, reject ) => {
-      // Start building
-      exec(`npm run build`, err => {
-        if ( err ) return reject(err);
-        return resolve()
-      })
-    }))
     .catch(err => console.log('ERROR : metalsmith-blog : Build'))
 };

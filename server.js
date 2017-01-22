@@ -5,7 +5,10 @@ const bodyParser = require('body-parser');
 const _          = require('lodash');
 
 // Use bodyParser
-app.use(bodyParser.json({ type : 'application/json' }));
+server.use(bodyParser.json({ type : 'application/json' }));
+
+// Trust NGINX proxy
+server.set('trust proxy', 'loopback');
 
 // Load all hooks
 const hooks = require('require-all')({
@@ -15,18 +18,25 @@ const hooks = require('require-all')({
 // Load hook secrets
 const secrets = require('./secrets');
 
+// Route for hooks
 server.get('/:webhook', ( req, res ) => {
   const webhook = req.params.webhook;
 
-  // If hook isn't found, return 400
-  if ( !_.find(_.keys(hooks), hook => hook === webhook) ) res.status(400).send();
+  // If hook isn't found, return 404
+  if ( !_.find(_.keys(hooks), hook => hook === webhook) ) {
+    console.log(`ACCESS : ${req.ip} : Used wrong hook`);
+    return res.status(404).send();
+  }
 
   const payload        = req.body;
   const providedSecret = payload && payload.hook && payload.hook.config ? payload.hook.config.secret : null;
   const hook           = _.find(secrets, { name : webhook });
 
-  // Verify secret
-  if ( hook.secret !== providedSecret ) res.status(400).send();
+  // Verify secret, if wrong, return 404
+  if ( hook.secret !== providedSecret ) {
+    console.log(`ACCESS : ${req.ip} : Used wrong secret`);
+    return res.status(404).send();
+  }
 
   // Request verified, proceed
   hook.run(payload);
@@ -35,4 +45,4 @@ server.get('/:webhook', ( req, res ) => {
   res.send(200)
 });
 
-app.listen(3000, () => console.log('Example app listening on port 3000!'));
+server.listen(3001, () => console.log('Webhook runner started'));
