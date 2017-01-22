@@ -46,7 +46,7 @@ server.post('/:webhook', ( req, res ) => {
   }
 
   // Request verified, proceed
-  hook.run(payload);
+  webhook[ hook ].run(payload);
 
   // Return 200
   res.send(200)
