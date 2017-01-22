@@ -1,0 +1,17 @@
+{
+  "name": "github-webhook-runner",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "run": "node ."
+  },
+  "author": "Tine jozelj <mentos1386@tjo.space>",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.16.0",
+    "express": "^4.14.0",
+    "lodash": "^4.17.4",
+    "require-all": "^2.1.0"
+  }
+}
