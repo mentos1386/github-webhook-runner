@@ -28,18 +28,19 @@ const secrets = require('./secrets');
 server.post('/:webhook', ( req, res ) => {
   const webhook = req.params.webhook;
 
-  // If hook isn't found, return 404
-  if ( !_.find(_.keys(hooks), hook => hook === webhook) ) {
+  // Try to find hook
+  const hook = _.find(_.keys(hooks), hook => hook === webhook);
+  if ( !hook ) {
     console.log(`ACCESS : ${req.ip} : Used wrong hook`);
     return res.status(404).send();
   }
 
   const payload        = req.body;
   const providedSecret = req.headers[ 'x-hub-signature' ] || '';
-  const hook           = _.find(secrets, { name : webhook });
+  const hookData       = _.find(secrets, { name : webhook });
 
   // Verify secret, if wrong, return 404
-  if ( !bufferEq(new Buffer(providedSecret), new Buffer(signData(hook.secret, JSON.stringify(payload)))) ) {
+  if ( !bufferEq(new Buffer(providedSecret), new Buffer(signData(hookData.secret, JSON.stringify(payload)))) ) {
     console.log(`ACCESS : ${req.ip} : Used wrong secret`);
     return res.status(404).send();
   }
