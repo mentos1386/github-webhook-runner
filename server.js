@@ -29,16 +29,8 @@ server.post('/:webhook', ( req, res ) => {
   }
 
   const payload        = req.body;
-  const providedSecret = payload && payload.hook && payload.hook.config ? payload.hook.config.secret : null;
   const hook           = _.find(secrets, { name : webhook });
 
-  // Verify secret, if wrong, return 404
-  if ( hook.secret !== providedSecret ) {
-    console.log(`ACCESS : ${req.ip} : Used wrong secret`);
-    return res.status(404).send();
-  }
-
-  // Request verified, proceed
   hook.run(payload);
 
   // Return 200
