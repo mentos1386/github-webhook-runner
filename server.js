@@ -19,7 +19,7 @@ const hooks = require('require-all')({
 const secrets = require('./secrets');
 
 // Route for hooks
-server.get('/:webhook', ( req, res ) => {
+server.post('/:webhook', ( req, res ) => {
   const webhook = req.params.webhook;
 
   // If hook isn't found, return 404
